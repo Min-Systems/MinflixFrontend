@@ -13,7 +13,7 @@ export default function App() {
 
   const handleFetchData = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/films");
+      const response = await fetch("https://minflixbackend-611864661290.us-west2.run.app");
       const data = await response.json();
       let textResult = "";
       for (let i = 0; i < data.length; i++) {
