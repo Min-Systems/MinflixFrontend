@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function ButtonComponent({ onClick }) {
-  return <button onClick={onClick} className="w-32 h-12 bg-black text-white rounded-none text-lg">Fetch Data</button>;
+  return <button onClick={onClick} className="w-32 h-12 bg-black text-white rounded-none text-lg">Fetch Films</button>;
 }
 
 function TextAreaComponent({ text }) {
@@ -9,22 +9,22 @@ function TextAreaComponent({ text }) {
 }
 
 export default function App() {
-  const [text, setText] = useState("Initial text");
+  const [text, setText] = useState("Click button to fetch films");
 
   const handleFetchData = async () => {
     try {
-      const response = await fetch("https://minflixbackend-611864661290.us-west2.run.app");
+      const response = await fetch("https://minflixbackend-611864661290.us-west2.run.app/films");
       const data = await response.json();
       let textResult = "";
       for (let i = 0; i < data.length; i++) {
         textResult += data[i].name + "\n";
       }
-      setText(textResult || "No message received");
+      setText(textResult || "No films found");
     } catch (error) {
       console.log("Error", error.stack);
       console.log("Error", error.name);
       console.log("Error", error.message);
-      setText("Error fetching data");
+      setText("Error fetching films");
     }
   };
 
