@@ -28,14 +28,14 @@ export default function App() {
     console.log("Attempting to fetch films from backend...");
     
     const response = await fetch("https://minflixbackend-611864661290.us-west2.run.app/films", {
+      method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Origin': 'https://minflixhd.web.app'
-      }
+        'Accept': 'application/json'
+      },
+      mode: 'cors'  // Explicitly set the mode to cors
     });
     
     console.log("Response status:", response.status);
-    console.log("Response headers:", [...response.headers.entries()]);
     
     if (!response.ok) {
       const errorText = await response.text();
