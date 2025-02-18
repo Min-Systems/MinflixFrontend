@@ -1,7 +1,15 @@
 import { useState } from "react";
 
-function ButtonComponent({ onClick }) {
-  return <button onClick={onClick} className="w-32 h-12 bg-black text-white rounded-none text-lg">Fetch Films</button>;
+function ButtonComponent({ onClick, isLoading }) {
+  return (
+    <button 
+      onClick={onClick} 
+      className="w-32 h-12 bg-black text-white rounded-none text-lg"
+      disabled={isLoading}
+    >
+      {isLoading ? 'Loading...' : 'Fetch Films'}
+    </button>
+  );
 }
 
 function TextAreaComponent({ text }) {
@@ -10,24 +18,35 @@ function TextAreaComponent({ text }) {
 
 export default function App() {
   const [text, setText] = useState("Click button to fetch films");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFetchData = async () => {
+    setIsLoading(true);
+    setText("Fetching films...");
+
     try {
       const response = await fetch("https://minflixbackend-611864661290.us-west2.run.app/films");
-      const data = await response.json();
-      let textResult = "";
-      for (let i = 0; i < data.length; i++) {
-        textResult += data[i].name + "\n";
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setText(textResult || "No films found");
+      
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        const textResult = data.map(film => film.name).join('\n');
+        setText(textResult || "No films found in database");
+      } else {
+        setText("Unexpected data format received");
+      }
     } catch (error) {
-      console.log("Error", error.stack);
-      console.log("Error", error.name);
-      console.log("Error", error.message);
-      setText("Error fetching films");
+      console.error("Error details:", error);
+      setText(`Error fetching films: ${error.message}\n\nPlease check the browser console for more details.`);
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  
   return (
     <div className="p-4 space-y-4 flex flex-col items-center">
       <TextAreaComponent text={text} />
