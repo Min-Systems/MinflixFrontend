@@ -42,6 +42,8 @@ export default function App() {
     } catch (error) {
       console.error("Error details:", error);
       setText(`Error fetching films: ${error.message}\n\nPlease check the browser console for more details.`);
+      console.log("Error name: ", error.name);
+      console.log("Error stack: ", error.stack);
     } finally {
       setIsLoading(false);
     }
