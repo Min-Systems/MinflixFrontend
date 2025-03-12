@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const RegistrationForm = () => {
+const AuthenticationForm = ({ endpoint }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,7 +19,7 @@ const RegistrationForm = () => {
 
         const formData = new FormData(event.target);
 
-        fetch('http://localhost:8000/registration', {
+        fetch(endpoint, {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -83,4 +83,4 @@ const RegistrationForm = () => {
     );
 };
 
-export default RegistrationForm;
+export default AuthenticationForm;

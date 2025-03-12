@@ -1,11 +1,21 @@
-import RegistrationForm from "./RegistrationForm";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+} from "react-router-dom";
+import LoginPage from "./LoginPage";
+import RegistrationPage from "./RegistrationPage";
+import ProfilePickerPage from "./ProfilePickerPage";
 
 const App = () => {
-  return(
-    <div>
-      <h1>Hello from the form</h1>
-      <RegistrationForm/>
-    </div>
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/profiles" element={<ProfilePickerPage />} />
+      </Routes>
+    </Router>
   );
 };
 
