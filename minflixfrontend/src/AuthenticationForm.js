@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const AuthenticationForm = ({ endpoint }) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +19,7 @@ const AuthenticationForm = ({ endpoint }) => {
 
         const formData = new FormData(event.target);
 
+        /*
         fetch(endpoint, {
             method: 'POST',
             body: formData,
@@ -31,18 +32,42 @@ const AuthenticationForm = ({ endpoint }) => {
         .catch(error => {
             console.error('Error:', error);
         });
+        */
+        fetch(endpoint, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const { access_token } = data;
+                console.log("data");
+                console.log(access_token);
+                // Store the token in localStorage or sessionStorage
+                localStorage.setItem('token', access_token);
+                // Redirect or update UI as needed
+            })
+            .catch(error => {
+                console.error('Login failed', error);
+            });
+
     };
 
     return (
         <form id='registrationForm' onSubmit={handleSubmit}>
             <p>
-                <label htmlFor='email'>Email:</label>
+                <label htmlFor='username'>Email:</label>
                 <input
-                    type='email'
-                    id='email'
-                    name='email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type='username'
+                    id='username'
+                    name='username'
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                 />
             </p>
