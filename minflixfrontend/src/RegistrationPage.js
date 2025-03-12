@@ -7,8 +7,9 @@ const RegistrationPage = () => {
 
     return (
         <div>
-           <h1>Registration Page</h1> 
-            <button onClick={() => navigate('/login')}>Go to Registration</button>
+            <h1>Registration Page</h1> 
+            <AuthenticationForm endpoint="http://localhost:8000/registration" />
+            <button onClick={() => navigate('/')}>Go to Login</button>
         </div>
     );
 };

@@ -1,11 +1,7 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from "react-router-dom";
-import LoginPage from "./LoginPage";
-import RegistrationPage from "./RegistrationPage";
-import ProfilePickerPage from "./ProfilePickerPage";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LoginPage from './LoginPage';
+import RegistrationPage from './RegistrationPage';
+import ProfilePickerPage from './ProfilePickerPage';
 
 const App = () => {
   return (
@@ -17,6 +13,6 @@ const App = () => {
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;
