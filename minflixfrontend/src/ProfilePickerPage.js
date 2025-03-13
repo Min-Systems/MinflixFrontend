@@ -1,9 +1,178 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import jwt_decode from 'jwt-decode';
 
 const ProfilePickerPage = () => {
+    const [showForm, setShowForm] = useState(false);
+    const [displayName, setDisplayName] = useState('');
+    const [profiles, setProfiles] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Get the token from localStorage and decode it
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            // Redirect to login if no token
+            navigate('/');
+            return;
+        }
+
+        try {
+            // Decode the token to get profile information
+            const decoded = jwt_decode(token);
+            setProfiles(decoded.profiles || []);
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            navigate('/');
+        }
+    }, [navigate]);
+
+    const openForm = () => {
+        setShowForm(true);
+    };
+
+    const closeForm = () => {
+        setShowForm(false);
+        setDisplayName('');
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('displayname', displayName);
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch('http://localhost:8000/addprofile', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to create profile with status: ${response.status}`);
+            }
+
+            // Get the new token from the response
+            const newToken = await response.text();
+            
+            // Update the token in localStorage
+            localStorage.setItem('authToken', newToken);
+            
+            // Decode the new token to get updated profiles
+            const decoded = jwt_decode(newToken);
+            setProfiles(decoded.profiles || []);
+            
+            // Close the form
+            closeForm();
+
+        } catch (error) {
+            console.error('Profile creation error:', error);
+            alert(`Failed to create profile: ${error.message}`);
+        }
+    };
+
     return (
-        <h1>Profile Dashboard</h1>
+        <div className="profile-dashboard">
+            <h1>Profile Dashboard</h1>
+
+            {/* Profile list (access same token from localStorage) */}
+
+            {/* Button to open form */}
+            <button className="open-button" onClick={openForm}>Create New Profile</button>
+
+            {/* Popup Form */}
+            <div className="form-popup" id="profileForm" style={{ display: showForm ? 'block' : 'none' }}>
+                <form onSubmit={handleSubmit} className="form-container">
+                    <h1>Create New Profile</h1>
+                    
+                    <label htmlFor="displayname"><b>Display Name</b></label>
+                    <input 
+                        type="text" 
+                        placeholder="Enter Display Name" 
+                        name="displayname" 
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        required 
+                    />
+
+                    <button type="submit" className="btn">Create</button>
+                    <button type="button" className="btn cancel" onClick={closeForm}>Close</button>
+                </form>
+            </div>
+
+            {/* CSS Styles */}
+            <style>
+                {`
+                .profile-dashboard {
+                    font-family: Arial, Helvetica, sans-serif;
+                    padding: 20px;
+                }
+
+                .open-button {
+                    background-color: #555;
+                    color: white;
+                    padding: 16px 20px;
+                    border: none;
+                    cursor: pointer;
+                    opacity: 0.8;
+                    margin-top: 20px;
+                }
+
+                .form-popup {
+                    display: none;
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    border: 3px solid #f1f1f1;
+                    z-index: 9;
+                }
+
+                .form-container {
+                    max-width: 300px;
+                    padding: 10px;
+                    background-color: white;
+                }
+
+                .form-container input[type=text] {
+                    width: 100%;
+                    padding: 15px;
+                    margin: 5px 0 22px 0;
+                    border: none;
+                    background: #f1f1f1;
+                }
+
+                .form-container input[type=text]:focus {
+                    background-color: #ddd;
+                    outline: none;
+                }
+
+                .form-container .btn {
+                    background-color: #04AA6D;
+                    color: white;
+                    padding: 16px 20px;
+                    border: none;
+                    cursor: pointer;
+                    width: 100%;
+                    margin-bottom: 10px;
+                    opacity: 0.8;
+                }
+
+                .form-container .cancel {
+                    background-color: red;
+                }
+
+                .form-container .btn:hover, .open-button:hover {
+                    opacity: 1;
+                }
+                `}
+            </style>
+        </div>
     );
 };
 
