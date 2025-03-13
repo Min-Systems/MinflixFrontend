@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const ProfilePickerPage = () => {
     return (
-        <h1>Profile Page</h1>
+        <h1>Profile Dashboard</h1>
     );
 };
 

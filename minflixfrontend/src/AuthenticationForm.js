@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthenticationForm = ({ endpoint }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
     const handleShowPasswordChange = (event) => {
         setShowPassword(event.target.checked);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
@@ -19,42 +22,31 @@ const AuthenticationForm = ({ endpoint }) => {
 
         const formData = new FormData(event.target);
 
-        /*
-        fetch(endpoint, {
-            method: 'POST',
-            body: formData,
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-        */
-        fetch(endpoint, {
-            method: 'POST',
-            body: formData,
-            credentials: 'include'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Login failed');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const { access_token } = data;
-                console.log("data");
-                console.log(access_token);
-                // Store the token in localStorage or sessionStorage
-                localStorage.setItem('token', access_token);
-                // Redirect or update UI as needed
-            })
-            .catch(error => {
-                console.error('Login failed', error);
-            });
+        try {
+            const requestOptions = {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            };
+
+            const response = await fetch(endpoint, requestOptions);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Authentication failed with status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Response data:", data);
+
+            localStorage.setItem('authToken', data.token);
+
+            navigate('/profiles')
+
+        } catch (error) {
+            console.error('Authentication error:', error);
+            throw error;
+        }
 
     };
 
