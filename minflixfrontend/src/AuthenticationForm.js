@@ -39,7 +39,7 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
             const data = await response.json();
             console.log("Response data:", data);
 
-            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('authToken', data);
 
             navigate('/profiles')
 

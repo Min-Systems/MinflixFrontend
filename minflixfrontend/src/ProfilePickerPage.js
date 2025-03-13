@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const ProfilePickerPage = () => {
     const [showForm, setShowForm] = useState(false);
@@ -19,7 +19,7 @@ const ProfilePickerPage = () => {
 
         try {
             // Decode the token to get profile information
-            const decoded = jwt_decode(token);
+            const decoded = jwtDecode(token);
             setProfiles(decoded.profiles || []);
         } catch (error) {
             console.error('Error decoding token:', error);
@@ -64,7 +64,7 @@ const ProfilePickerPage = () => {
             localStorage.setItem('authToken', newToken);
             
             // Decode the new token to get updated profiles
-            const decoded = jwt_decode(newToken);
+            const decoded = jwtDecode(newToken);
             setProfiles(decoded.profiles || []);
             
             // Close the form
