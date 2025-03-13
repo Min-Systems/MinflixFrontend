@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AuthenticationForm = ({ endpoint }) => {
+const AuthenticationForm = ({ endpoint, isLogin = false }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,7 +15,7 @@ const AuthenticationForm = ({ endpoint }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (password !== confirmPassword) {
+        if (!isLogin && password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
@@ -47,7 +47,6 @@ const AuthenticationForm = ({ endpoint }) => {
             console.error('Authentication error:', error);
             throw error;
         }
-
     };
 
     return (
@@ -74,16 +73,18 @@ const AuthenticationForm = ({ endpoint }) => {
                     required
                 />
             </p>
-            <p>
-                <label htmlFor='confirmPassword'>Confirm Password:</label>
-                <input
-                    type={showPassword ? 'text' : 'password'}
-                    id='confirmPassword'
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                />
-            </p>
+            {!isLogin && (
+                <p>
+                    <label htmlFor='confirmPassword'>Confirm Password:</label>
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        id='confirmPassword'
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                    />
+                </p>
+            )}
             <p>
                 <label htmlFor='showPassword'>Show Password </label>
                 <input
@@ -94,7 +95,7 @@ const AuthenticationForm = ({ endpoint }) => {
                 />
             </p>
             <p>
-                <button type='submit'>Submit</button>
+                <button type='submit'>{isLogin ? 'Login' : 'Register'}</button>
             </p>
         </form>
     );

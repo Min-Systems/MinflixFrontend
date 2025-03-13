@@ -7,7 +7,7 @@ const LoginPage = () => {
     return (
         <div>
             <h1>Login Page</h1>
-            <AuthenticationForm endpoint='http://localhost:8000/login'/>
+            <AuthenticationForm endpoint='http://localhost:8000/login' isLogin={true} />
             <button onClick={() => navigate('/register')}>Go to Registration</button>
         </div>
     );
