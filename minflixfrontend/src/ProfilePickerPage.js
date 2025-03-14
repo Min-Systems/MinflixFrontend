@@ -51,7 +51,7 @@ const ProfilePickerPage = () => {
                 },
                 credentials: 'include'
             };
-            const response = await fetch('http://localhost:8000/addprofile', requestOptions);
+            const response = await fetch('https://minflixbackend-611864661290.us-west2.run.app/addprofile', requestOptions);
 
             if (!response.ok) {
                 const errorData = await response.json();
