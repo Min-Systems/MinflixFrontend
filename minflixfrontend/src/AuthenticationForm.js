@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
 
 const AuthenticationForm = ({ endpoint, isLogin = false }) => {
     const [username, setUsername] = useState('');
@@ -21,37 +20,50 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
             return;
         }
 
-        const formData = new FormData(event.target);
-
         try {
-            const requestOptions = {
+            // Create URLSearchParams for OAuth2 compatibility
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+            
+            console.log(`Submitting to: ${endpoint}`);
+            console.log(`With username: ${username}`);
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
                 body: formData,
                 credentials: 'include'
-            };
-
-            const response = await fetch(endpoint, requestOptions);
+            });
+            
+            console.log(`Response status: ${response.status}`);
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `Authentication failed with status: ${response.status}`);
+                let errorMessage;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || `Authentication failed with status: ${response.status}`;
+                } catch (e) {
+                    errorMessage = `Authentication failed with status: ${response.status}`;
+                }
+                throw new Error(errorMessage);
             }
 
-            const data = await response.json();
-            console.log("Response data:", data);
-
-            localStorage.setItem('authToken', data);
-
-            navigate('/profiles')
+            // Get the token from the response
+            const token = await response.text();
+            console.log("Authentication successful!");
+            
+            // Store the token
+            localStorage.setItem('authToken', token);
+            
+            // Navigate to profiles page
+            navigate('/profiles');
 
         } catch (error) {
-            console.log('caught error');
-            navigate('/');
-            window.alert('Login Failed Please Try Again');
-            /*
             console.error('Authentication error:', error);
-            throw error;
-            */
+            alert(`Authentication failed: ${error.message}`);
         }
     };
 
@@ -60,7 +72,7 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
             <p>
                 <label htmlFor='username'>Email:</label>
                 <input
-                    type='username'
+                    type='email'
                     id='username'
                     name='username'
                     value={username}
