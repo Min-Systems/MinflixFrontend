@@ -35,48 +35,7 @@ const ProfilePickerPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [displayName, setDisplayName] = useState('');
     const [profiles, setProfiles] = useState([]);
-    const [showFilmPopup, setShowFilmPopup] = useState(false);
-    const [selectedProfile, setSelectedProfile] = useState(null);
     const navigate = useNavigate();
-
-    // Example film data from example_data.py
-    const exampleFilms = [
-        { 
-            id: 1, 
-            title: "Echoes of Tomorrow", 
-            length: 120,
-            location: "Vancouver",
-            producer: "Elena Garcia"
-        },
-        { 
-            id: 2, 
-            title: "Under the Crimson Sun", 
-            length: 140,
-            location: "Arizona",
-            producer: "Jackson King"
-        },
-        { 
-            id: 3, 
-            title: "The Whispering Waves", 
-            length: 130,
-            location: "Sydney",
-            producer: "Diana Hughes"
-        },
-        { 
-            id: 4, 
-            title: "Starlight Odyssey", 
-            length: 150,
-            location: "Cape Canaveral",
-            producer: "Henry Wells"
-        },
-        { 
-            id: 5, 
-            title: "Chasing Shadows", 
-            length: 110,
-            location: "London",
-            producer: "Victoria Hayes"
-        }
-    ];
 
     useEffect(() => {
         // Get the token from localStorage and decode it
@@ -147,13 +106,10 @@ const ProfilePickerPage = () => {
     };
 
     const handleSelectProfile = (profile) => {
-        setSelectedProfile(profile);
-        setShowFilmPopup(true);
-    };
-
-    const closeFilmPopup = () => {
-        setShowFilmPopup(false);
-        setSelectedProfile(null);
+        // Store selected profile in localStorage for future use
+        localStorage.setItem('selectedProfile', JSON.stringify(profile));
+        console.log(`Selected profile: ${profile.displayname}`);
+        // You can add navigation or other actions here in the future
     };
 
     return (
@@ -184,24 +140,6 @@ const ProfilePickerPage = () => {
                     <button type="submit" className="btn">Create</button>
                     <button type="button" className="btn cancel" onClick={closeForm}>Close</button>
                 </form>
-            </div>
-
-            {/* Film Data Popup */}
-            <div className="film-popup" style={{ display: showFilmPopup ? 'block' : 'none' }}>
-                <div className="film-popup-content">
-                    <h2>{selectedProfile ? `${selectedProfile.displayname}'s Films` : 'Films'}</h2>
-                    <div className="film-list">
-                        {exampleFilms.map(film => (
-                            <div key={film.id} className="film-item">
-                                <h3>{film.title}</h3>
-                                <p><strong>Length:</strong> {film.length} minutes</p>
-                                <p><strong>Location:</strong> {film.location}</p>
-                                <p><strong>Producer:</strong> {film.producer}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <button type="button" className="close-btn" onClick={closeFilmPopup}>Close</button>
-                </div>
             </div>
 
             {/* CSS Styles */}
@@ -315,63 +253,6 @@ const ProfilePickerPage = () => {
                 .profile-name {
                     text-align: center;
                     font-weight: bold;
-                }
-
-                /* Film Popup Styles */
-                .film-popup {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0,0,0,0.7);
-                    z-index: 10;
-                }
-
-                .film-popup-content {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    width: 80%;
-                    max-width: 700px;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                }
-
-                .film-list {
-                    margin-top: 20px;
-                }
-
-                .film-item {
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    padding: 15px;
-                    margin-bottom: 15px;
-                    background-color: #f9f9f9;
-                }
-
-                .film-item h3 {
-                    margin-top: 0;
-                    color: #333;
-                }
-
-                .close-btn {
-                    background-color: #e74c3c;
-                    color: white;
-                    padding: 10px 15px;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    margin-top: 15px;
-                }
-
-                .close-btn:hover {
-                    background-color: #c0392b;
                 }
                 `}
             </style>
