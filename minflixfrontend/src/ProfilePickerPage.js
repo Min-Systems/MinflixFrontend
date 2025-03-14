@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import LogoutButton from "./LogoutButton";
 
 const ProfilePickerPage = () => {
     const [showForm, setShowForm] = useState(false);
@@ -172,6 +173,7 @@ const ProfilePickerPage = () => {
                 }
                 `}
             </style>
+            <LogoutButton />
         </div>
     );
 };

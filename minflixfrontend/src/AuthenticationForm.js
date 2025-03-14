@@ -44,8 +44,13 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
             navigate('/profiles')
 
         } catch (error) {
+            console.log('caught error');
+            navigate('/');
+            window.alert('Login Failed Please Try Again');
+            /*
             console.error('Authentication error:', error);
             throw error;
+            */
         }
     };
 
