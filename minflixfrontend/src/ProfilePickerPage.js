@@ -38,10 +38,13 @@ const ProfilePickerPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log('Initializing ProfilePickerPage and checking for existing profiles...');
+        
         // Get the token from localStorage and decode it
         const token = localStorage.getItem('authToken');
         if (!token) {
             // Redirect to login if no token
+            console.log('No authentication token found, redirecting to login page');
             navigate('/');
             return;
         }
@@ -49,7 +52,18 @@ const ProfilePickerPage = () => {
         try {
             // Decode the token to get profile information
             const decoded = jwtDecode(token);
-            setProfiles(decoded.profiles || []);
+            
+            // Check if profiles exist in the token
+            const existingProfiles = decoded.profiles || [];
+            console.log(`Found ${existingProfiles.length} existing profiles`);
+            
+            // Update state with any existing profiles
+            setProfiles(existingProfiles);
+            
+            // If there are existing profiles, log their details for verification
+            if (existingProfiles.length > 0) {
+                console.log('Existing profiles:', existingProfiles);
+            }
         } catch (error) {
             console.error('Error decoding token:', error);
             navigate('/');
