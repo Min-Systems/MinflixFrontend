@@ -8,7 +8,7 @@ const RegistrationPage = () => {
     return (
         <div>
             <h1>Registration Page</h1> 
-            <AuthenticationForm endpoint="http://localhost:8000/registration" />
+            <AuthenticationForm endpoint="https://minflixbackend-611864661290.us-west2.run.app/registration" />
             <button onClick={() => navigate('/')}>Go to Login</button>
         </div>
     );

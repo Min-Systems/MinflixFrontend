@@ -87,7 +87,7 @@ const ProfilePickerPage = () => {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:8000/addprofile', {
+            const response = await fetch('https://minflixbackend-611864661290.us-west2.run.app/addprofile', {
                 method: 'POST',
                 body: formData,
                 headers: {
