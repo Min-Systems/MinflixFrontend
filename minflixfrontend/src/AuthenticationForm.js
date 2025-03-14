@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 const AuthenticationForm = ({ endpoint, isLogin = false }) => {
     const [username, setUsername] = useState('');
