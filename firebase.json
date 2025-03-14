@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "testfrontend/build",
+    "public": "minflixfrontend/build",
     "ignore": [
       "firebase.json",
       "**/.*",
