@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login, register } from './Network'; // Import the API functions
 
-const AuthenticationForm = ({ endpoint, isLogin = false }) => {
+const AuthenticationForm = ({ isLogin = false }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleShowPasswordChange = (event) => {
@@ -14,45 +16,19 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
 
         if (!isLogin && password !== confirmPassword) {
             alert('Passwords do not match!');
+            setIsLoading(false);
             return;
         }
 
         try {
-            // Create URLSearchParams for OAuth2 compatibility
-            const formData = new URLSearchParams();
-            formData.append('username', username);
-            formData.append('password', password);
+            // Use the appropriate API function based on form type
+            const authFunction = isLogin ? login : register;
+            const token = await authFunction(username, password);
             
-            console.log(`Submitting to: ${endpoint}`);
-            console.log(`With username: ${username}`);
-
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData,
-                credentials: 'include'
-            });
-            
-            console.log(`Response status: ${response.status}`);
-
-            if (!response.ok) {
-                let errorMessage;
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.detail || `Authentication failed with status: ${response.status}`;
-                } catch (e) {
-                    errorMessage = `Authentication failed with status: ${response.status}`;
-                }
-                throw new Error(errorMessage);
-            }
-
-            // Get the token from the response
-            const token = await response.text();
             console.log("Authentication successful!");
             
             // Store the token
@@ -64,6 +40,8 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
         } catch (error) {
             console.error('Authentication error:', error);
             alert(`Authentication failed: ${error.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -78,6 +56,7 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
+                    disabled={isLoading}
                 />
             </p>
             <p>
@@ -89,6 +68,7 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                 />
             </p>
             {!isLogin && (
@@ -100,6 +80,7 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
+                        disabled={isLoading}
                     />
                 </p>
             )}
@@ -110,10 +91,13 @@ const AuthenticationForm = ({ endpoint, isLogin = false }) => {
                     type='checkbox'
                     checked={showPassword}
                     onChange={handleShowPasswordChange}
+                    disabled={isLoading}
                 />
             </p>
             <p>
-                <button type='submit'>{isLogin ? 'Login' : 'Register'}</button>
+                <button type='submit' disabled={isLoading}>
+                    {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Register')}
+                </button>
             </p>
         </form>
     );

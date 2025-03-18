@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import LogoutButton from "./LogoutButton";
+import { addProfile, getTokenData, isTokenValid } from './Network';
 
 const ProfilePickerPage = () => {
     const [profileText, setProfileText] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [error, setError] = useState('');
     const [debug, setDebug] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const buttonStyle = {
@@ -28,60 +29,36 @@ const ProfilePickerPage = () => {
         console.log("DEBUG:", message);
     };
 
-    // Helper function to properly extract the token, removing any quotes
-    const getCleanToken = () => {
-        const rawToken = localStorage.getItem('authToken');
-        if (!rawToken) return null;
-        
-        // Remove any surrounding quotes if present
-        return rawToken.replace(/^["'](.*)["']$/, '$1');
-    };
-
     const loadProfiles = () => {
         try {
-            const token = getCleanToken();
-            if (!token) {
-                setError('No authentication token found. Please login again.');
-                navigate('/');
+            addDebugInfo('------ Loading profiles ------');
+            
+            // Check token validity
+            if (!isTokenValid()) {
+                addDebugInfo('Token is invalid or expired!');
+                setError('Your session has expired. Please login again.');
+                setTimeout(() => navigate('/'), 3000);
                 return;
             }
-
-            addDebugInfo(`Clean token from localStorage (first 20 chars): ${token.substring(0, 20)}...`);
             
-            try {
-                const decoded = jwtDecode(token);
-                addDebugInfo(`Decoded token: ${JSON.stringify(decoded)}`);
-                
-                // Check token expiration
-                const exp = decoded.exp;
-                const now = Math.floor(Date.now() / 1000);
-                addDebugInfo(`Token expires at: ${exp}, current time: ${now}, difference: ${exp - now} seconds`);
-                
-                if (exp && exp < now) {
-                    addDebugInfo('Token is expired!');
-                    setError('Your session has expired. Please login again.');
-                    navigate('/');
-                    return;
-                }
-                
-                const profiles = decoded.profiles || [];
-                addDebugInfo(`Found ${profiles.length} profiles`);
+            // Get token data
+            const tokenData = getTokenData();
+            addDebugInfo(`Decoded token: ${JSON.stringify(tokenData)}`);
+            
+            const profiles = tokenData?.profiles || [];
+            addDebugInfo(`Found ${profiles.length} profiles`);
 
-                if (profiles.length === 0) {
-                    setProfileText('No profiles');
-                } else {
-                    let profilesList = "";
-                    for (let i = 0; i < profiles.length; i++) {
-                        profilesList += profiles[i].displayname + '\n';
-                    }
-                    setProfileText(profilesList);
+            if (profiles.length === 0) {
+                setProfileText('No profiles');
+            } else {
+                let profilesList = "";
+                for (let i = 0; i < profiles.length; i++) {
+                    profilesList += profiles[i].displayname + '\n';
                 }
-            } catch (decodeError) {
-                addDebugInfo(`Error decoding token: ${decodeError.message}`);
-                setError('Invalid token format. Please login again.');
+                setProfileText(profilesList);
             }
         } catch (error) {
-            addDebugInfo(`General error in loadProfiles: ${error.message}`);
+            addDebugInfo(`Error in loadProfiles: ${error.message}`);
             setError('Error loading profiles. Please login again.');
         }
     };
@@ -89,84 +66,43 @@ const ProfilePickerPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setError('');
+        setIsLoading(true);
         addDebugInfo('------ Starting profile creation ------');
 
         try {
-            const token = getCleanToken();
-            if (!token) {
-                setError('No authentication token found. Please login again.');
+            // Check token validity before attempting request
+            if (!isTokenValid()) {
+                addDebugInfo('Token is invalid or expired!');
+                setError('Your session has expired. Please login again.');
+                setTimeout(() => navigate('/'), 3000);
                 return;
             }
 
-            addDebugInfo(`Using clean token (first 20 chars): ${token.substring(0, 20)}...`);
             addDebugInfo(`Creating profile with displayname: ${displayName}`);
-
-            // Using URLSearchParams for consistency with login/registration
-            const formData = new URLSearchParams();
-            formData.append('displayname', displayName);
             
-            // Construct the header WITHOUT extra quotes
-            const authHeader = `Bearer ${token}`;
-            addDebugInfo(`Full Authorization header: ${authHeader}`);
+            // Use the API function from network.js
+            const newToken = await addProfile(displayName);
             
-            const response = await fetch('https://minflixbackend-611864661290.us-west2.run.app/addprofile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': authHeader
-                },
-                body: formData,
-                credentials: 'include'
-            });
-
-            addDebugInfo(`Response status: ${response.status} ${response.statusText}`);
-            
-            // Clone the response so we can log it and still read body
-            const responseClone = response.clone();
-            const responseText = await responseClone.text();
-            addDebugInfo(`Raw response: ${responseText}`);
-            
-            if (!response.ok) {
-                let errorMessage = `Server error: ${response.status} ${response.statusText}`;
-                
-                try {
-                    // Try to parse the response as JSON
-                    const errorData = JSON.parse(responseText);
-                    errorMessage = errorData.detail || errorMessage;
-                    addDebugInfo(`Parsed error: ${JSON.stringify(errorData)}`);
-                } catch (e) {
-                    addDebugInfo(`Could not parse error response as JSON: ${e.message}`);
-                }
-                
-                setError(errorMessage);
-                
-                if (response.status === 401) {
-                    addDebugInfo('Authentication error - redirecting to login');
-                    setError('Your session has expired. Please login again.');
-                    setTimeout(() => navigate('/'), 3000);
-                }
-                return;
-            }
-
             // Success!
             addDebugInfo('Profile created successfully!');
-            try {
-                // Try to parse as JSON
-                const data = JSON.parse(responseText);
-                localStorage.setItem('authToken', data);
-                addDebugInfo('Updated token in localStorage');
-            } catch (e) {
-                // If not JSON, use as is (without adding quotes)
-                localStorage.setItem('authToken', responseText);
-                addDebugInfo('Saved raw response as token');
-            }
+            localStorage.setItem('authToken', newToken);
+            addDebugInfo('Updated token in localStorage');
             
             setDisplayName(''); // Clear the input
             loadProfiles(); // Reload profiles
 
         } catch (error) {
-            addDebugInfo(`Fetch error: ${error.message}`);
-            setError(`Network error: ${error.message}`);
+            addDebugInfo(`Error creating profile: ${error.message}`);
+            setError(`Error: ${error.message}`);
+            
+            // If it's an auth error, redirect to login
+            if (error.message.includes('Authentication') || error.message.includes('401')) {
+                addDebugInfo('Authentication error - redirecting to login');
+                setError('Your session has expired. Please login again.');
+                setTimeout(() => navigate('/'), 3000);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -188,9 +124,20 @@ const ProfilePickerPage = () => {
                             value={displayName}
                             style={{ width: '300px', height: '40px', padding: '10px', borderRadius: '5px', marginRight: '10px' }}
                             onChange={(e) => setDisplayName(e.target.value)}
+                            disabled={isLoading}
                             required
                         />
-                        <button type='submit' style={buttonStyle}>Create Profile</button>
+                        <button 
+                            type='submit' 
+                            style={{
+                                ...buttonStyle,
+                                opacity: isLoading ? 0.7 : 1,
+                                cursor: isLoading ? 'not-allowed' : 'pointer'
+                            }}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Creating...' : 'Create Profile'}
+                        </button>
                     </form>
                 </div>
             </div>
