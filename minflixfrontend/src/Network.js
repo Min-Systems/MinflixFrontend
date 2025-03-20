@@ -100,8 +100,18 @@ export const addProfile = async (displayName) => {
 };
 
 // Edit a profile
-export const editProfile = async () => {
+export const editProfile = async (displayName, newDisplayName) => {
+  const formData = new URLSearchParams();
+  formData.append('displayname', displayName);
+  formData.append('newdisplayname', newDisplayName);
 
+  return apiRequest('/editprofile', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData
+  }, true); // requires authentication
 };
 
 //Get JWT token data

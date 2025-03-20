@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
-import { addProfile, getTokenData, isTokenValid } from './Network';
+import { addProfile, editProfile, getTokenData, isTokenValid } from './Network';
 
 const ProfilePickerPage = () => {
     const [profiles, setProfiles] = useState([]);
@@ -42,7 +42,6 @@ const ProfilePickerPage = () => {
             setProfiles(tokenData.profiles);
             // Close the form
 
-            setShowAddProfileForm(false)
         } catch (error) {
             console.log(`Error in loadProfiles: ${error.message}`);
         }
@@ -66,6 +65,34 @@ const ProfilePickerPage = () => {
 
             setDisplayName('');
             loadProfiles();
+            setShowAddProfileForm(false);
+        } catch (error) {
+            console.log(`Error in loadProfiles: ${error.message}`);
+        }
+
+    };
+
+    const handleEditProfileSubmit = async (event) => {
+        event.preventDefault();
+
+        try {
+            // Check token validity before attempting request
+            if (!isTokenValid()) {
+                setTimeout(() => navigate('/'), 3000);
+                return;
+            }
+
+        ///    const newToken = await addProfile(displayName);
+            // Use the API function from network.js
+            const newToken = await editProfile(displayName, newDisplayName);
+
+            // Success!
+            localStorage.setItem('authToken', newToken);
+
+            setDisplayName('');
+            setNewDisplayName('');
+            loadProfiles();
+            setShowEditProfileForm(false);
         } catch (error) {
             console.log(`Error in loadProfiles: ${error.message}`);
         }
@@ -98,7 +125,7 @@ const ProfilePickerPage = () => {
             <button onClick={() => setShowEditProfileForm(true)}>Edit Profile</button>
             <div id='editProfileFormContainer'>
                 {showEditProfileForm && (
-                    <form id='editProfileForm' style={profileFormStyle}>
+                    <form id='editProfileForm' onSubmit={handleEditProfileSubmit} style={profileFormStyle}>
                         <input
                             type='text'
                             placeholder='Enter display name'
