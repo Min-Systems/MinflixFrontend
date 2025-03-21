@@ -1,6 +1,9 @@
 import { jwtDecode } from 'jwt-decode';
-// swap base url for production: https://minflixbackend-611864661290.us-west2.run.app | http://localhost:8000
-const API_BASE_URL = 'https://minflixbackend-611864661290.us-west2.run.app';
+// swap base url for production: 
+// https://minflixbackend-611864661290.us-west2.run.app
+// https://minflixbackend.onrender.com
+// http://localhost:8000
+const API_BASE_URL = 'https://minflixbackend.onrender.com';
 
 // Gets authentication token from localStorage
 const getAuthToken = () => {
