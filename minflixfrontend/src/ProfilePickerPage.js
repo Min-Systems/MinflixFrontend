@@ -23,6 +23,9 @@ const ProfilePickerPage = () => {
         zIndex: 1000
     };
 
+    useEffect(() => {
+        loadProfiles();
+    }, []);
 
     const loadProfiles = () => {
         try {
@@ -43,10 +46,6 @@ const ProfilePickerPage = () => {
             console.log(`Error in loadProfiles: ${error.message}`);
         }
     };
-
-    useEffect(() => {
-        loadProfiles();
-    }, []);
 
     const handleAddProfileSubmit = async (event) => {
         event.preventDefault();
