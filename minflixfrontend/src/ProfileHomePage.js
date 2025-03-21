@@ -1,7 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
 import { getTokenData, isTokenValid } from './Network';
+import FilmList from './FilmList';
 
 const ProfileHomePage = () => {
     const navigate = useNavigate();
@@ -40,6 +40,7 @@ const ProfileHomePage = () => {
             <h2>Profile Home Page</h2>
             <p>Profile for {displayName}</p>
             <button onClick={() => navigate("/profiles")}>Back to profiles</button>
+            <FilmList filmList={['echoes_of_tommorow', 'starlight_odyssey', 'under_the_crimson_sun']}/>
         </div>
     );
 

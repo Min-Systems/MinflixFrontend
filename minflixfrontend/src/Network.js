@@ -150,5 +150,6 @@ export default {
   register,
   addProfile,
   getTokenData,
-  isTokenValid
+  isTokenValid,
+  API_BASE_URL
 };
