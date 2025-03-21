@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:8000';
 const getAuthToken = () => {
   const rawToken = localStorage.getItem('authToken');
   if (!rawToken) return null;
-  
+
   // Remove any quotes from the token
   return rawToken.replace(/^["'](.*)["']$/, '$1');
 };
@@ -14,12 +14,12 @@ const getAuthToken = () => {
 // Make an authenticated API request
 const apiRequest = async (endpoint, options = {}, requiresAuth = false) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   // headers
   const headers = {
     ...options.headers,
   };
-  
+
   // Add authentication if required
   if (requiresAuth) {
     const token = getAuthToken();
@@ -28,17 +28,17 @@ const apiRequest = async (endpoint, options = {}, requiresAuth = false) => {
     }
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   // Merge options
   const requestOptions = {
     ...options,
     headers,
     credentials: 'include'
   };
-  
+
   // Make the request
   const response = await fetch(url, requestOptions);
-  
+
   // Handle common errors
   if (!response.ok) {
     let errorMessage;
@@ -50,7 +50,7 @@ const apiRequest = async (endpoint, options = {}, requiresAuth = false) => {
     }
     throw new Error(errorMessage);
   }
-  
+
   // Return the response (as text, then caller can parse if needed)
   return await response.text();
 };
@@ -60,7 +60,7 @@ export const login = async (username, password) => {
   const formData = new URLSearchParams();
   formData.append('username', username);
   formData.append('password', password);
-  
+
   return apiRequest('/login', {
     method: 'POST',
     headers: {
@@ -75,7 +75,7 @@ export const register = async (username, password) => {
   const formData = new URLSearchParams();
   formData.append('username', username);
   formData.append('password', password);
-  
+
   return apiRequest('/registration', {
     method: 'POST',
     headers: {
@@ -89,8 +89,23 @@ export const register = async (username, password) => {
 export const addProfile = async (displayName) => {
   const formData = new URLSearchParams();
   formData.append('displayname', displayName);
-  
+
   return apiRequest('/addprofile', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData
+  }, true); // requires authentication
+};
+
+// Edit a profile
+export const editProfile = async (displayName, newDisplayName) => {
+  const formData = new URLSearchParams();
+  formData.append('displayname', displayName);
+  formData.append('newdisplayname', newDisplayName);
+
+  return apiRequest('/editprofile', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -104,7 +119,7 @@ export const getTokenData = () => {
   try {
     const token = getAuthToken();
     if (!token) return null;
-    
+
     // decode the token
     return jwtDecode(token);
   } catch (error) {
@@ -118,11 +133,11 @@ export const isTokenValid = () => {
   try {
     const tokenData = getTokenData();
     if (!tokenData) return false;
-    
+
     // Check expiration
     const exp = tokenData.exp;
     const now = Math.floor(Date.now() / 1000);
-    
+
     return exp && exp > now;
   } catch (error) {
     return false;
@@ -135,5 +150,6 @@ export default {
   register,
   addProfile,
   getTokenData,
-  isTokenValid
+  isTokenValid,
+  API_BASE_URL
 };
