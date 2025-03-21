@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { addProfile, editProfile, getTokenData, isTokenValid } from './Network';
 
@@ -82,7 +82,6 @@ const ProfilePickerPage = () => {
                 return;
             }
 
-        ///    const newToken = await addProfile(displayName);
             // Use the API function from network.js
             const newToken = await editProfile(displayName, newDisplayName);
 
@@ -99,6 +98,10 @@ const ProfilePickerPage = () => {
 
     };
 
+    const handleProfileSelect = (profileId) => {
+       navigate(`/profile/${profileId}`);
+    };
+
     return (
         <div id='overlay'>
             <h2>Profile Dashboard</h2>
@@ -112,7 +115,7 @@ const ProfilePickerPage = () => {
                             <li key={profile.id} id='profileListItem'>
                                 <button
                                     id='profileButton'
-                                //onClick={() => onProfileSelect(profile.id)}
+                                    onClick={() => handleProfileSelect(profile.id)}
                                 >
                                     {profile.displayname}
                                 </button>
