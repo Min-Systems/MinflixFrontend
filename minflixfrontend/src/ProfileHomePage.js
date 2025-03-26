@@ -2,6 +2,7 @@ import React, { useState, useEffect, use } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTokenData, isTokenValid } from './Network';
 import FilmList from './FilmList';
+import EditProfileForm from './EditProfileForm';
 
 const ProfileHomePage = () => {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ const ProfileHomePage = () => {
     return (
         <div>
             <h2>Profile Home Page</h2>
+            <EditProfileForm  loadProfile={loadProfileData}/>
             <p>Profile for {displayName}</p>
             <button onClick={() => navigate("/profiles")}>Back to profiles</button>
             <FilmList filmList={['echoes_of_tommorow', 'starlight_odyssey', 'under_the_crimson_sun']}/>
