@@ -114,7 +114,12 @@ export const editProfile = async (displayName, newDisplayName) => {
   }, true); // requires authentication
 };
 
-//Get JWT token data
+// Add a watch later
+export const addWatchLater = async(filmId, profileId) => {
+  const formData = new URLSearchParams();
+};
+
+// Get JWT token data
 export const getTokenData = () => {
   try {
     const token = getAuthToken();
