@@ -1,6 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 // swap base url for production: https://minflixbackend-611864661290.us-west2.run.app
-const API_BASE_URL = 'http://localhost:8000';
+// const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.API_BASE_URL;
+console.log(`api base url ${API_BASE_URL}`)
 
 // Gets authentication token from localStorage
 const getAuthToken = () => {
@@ -114,7 +116,12 @@ export const editProfile = async (displayName, newDisplayName) => {
   }, true); // requires authentication
 };
 
-//Get JWT token data
+// Add a watch later
+export const addWatchLater = async(filmId, profileId) => {
+  const formData = new URLSearchParams();
+};
+
+// Get JWT token data
 export const getTokenData = () => {
   try {
     const token = getAuthToken();
