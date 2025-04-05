@@ -67,7 +67,7 @@
     margin-bottom: 1rem;
   }
   
-  /* Logout button sits below */
+  /* Logout button sits below here */
   #logoutButtonContainer {
     display: flex;
     justify-content: center;
