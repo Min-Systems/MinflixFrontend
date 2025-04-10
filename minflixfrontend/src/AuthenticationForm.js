@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { login, register } from './Network'; // Import the API functions
+import 'boxicons'
 
 const AuthenticationForm = ({ isLogin = false }) => {
     const [username, setUsername] = useState('');
@@ -47,45 +49,55 @@ const AuthenticationForm = ({ isLogin = false }) => {
 
     return (
         <form id='registrationForm' onSubmit={handleSubmit}>
-            <p>
-                <label htmlFor='username'>Email:</label>
+            
+            <div class = "input-box">
+             
+          {/*      <label htmlFor='username'>Email: <i class='bx bxs-user'></i></label>  */}
                 <input
                     type='email'
                     id='username'
                     name='username'
+                    placeholder='Email'
+                    
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                     disabled={isLoading}
                 />
-            </p>
-            <p>
-                <label htmlFor='password'>Password:</label>
+                 <i class='bx bx-user'></i> 
+            </div>
+            
+            <div class = "input-box">
+            {/*    <label htmlFor='password'>Password:</label> */}
                 <input
                     type={showPassword ? 'text' : 'password'}
                     id='password'
                     name='password'
+                    placeholder='Password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
                 />
-            </p>
+                <i class='bx bxs-user'></i>
+            </div>
+            
             {!isLogin && (
-                <p>
-                    <label htmlFor='confirmPassword'>Confirm Password:</label>
+                <div class = "input-box">
+                  {/*  <label htmlFor='confirmPassword'>Confirm Password:</label> */}
                     <input
                         type={showPassword ? 'text' : 'password'}
                         id='confirmPassword'
+                        placeholder='Confirm Password'
+                        
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         disabled={isLoading}
                     />
-                </p>
+                </div>
             )}
-            <p>
-                <label htmlFor='showPassword'>Show Password </label>
+            <div class = "show-password">
                 <input
                     id='showPassword'
                     type='checkbox'
@@ -93,7 +105,8 @@ const AuthenticationForm = ({ isLogin = false }) => {
                     onChange={handleShowPasswordChange}
                     disabled={isLoading}
                 />
-            </p>
+                <label htmlFor='showPassword'> Show Password </label>
+            </div>
             <p>
                 <button type='submit' disabled={isLoading}>
                     {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Register')}
